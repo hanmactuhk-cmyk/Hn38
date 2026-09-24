@@ -1,0 +1,82 @@
+name: Build Hn38videoAItool Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Install Playwright Chromium
+        shell: powershell
+        run: |
+          python -m playwright install chromium
+
+      - name: Build EXE
+        shell: powershell
+        run: |
+          pyinstaller `
+            --noconfirm `
+            --clean `
+            --windowed `
+            --name Hn38videoAItool `
+            desktop/main.py
+
+      - name: Create runtime folders
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force "dist/Hn38videoAItool/data" | Out-Null
+          New-Item -ItemType Directory -Force "dist/Hn38videoAItool/output" | Out-Null
+          New-Item -ItemType Directory -Force "dist/Hn38videoAItool/logs" | Out-Null
+
+      - name: Copy flow configuration
+        shell: powershell
+        run: |
+          if (Test-Path "data/flows.json") {
+            Copy-Item "data/flows.json" "dist/Hn38videoAItool/data/flows.json" -Force
+          }
+
+      - name: Copy README
+        shell: powershell
+        run: |
+          if (Test-Path "README.md") {
+            Copy-Item "README.md" "dist/Hn38videoAItool/README.md" -Force
+          }
+
+      - name: Package ZIP
+        shell: powershell
+        run: |
+          Compress-Archive `
+            -Path "dist/Hn38videoAItool/*" `
+            -DestinationPath "Hn38videoAItool-Windows.zip" `
+            -Force
+
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hn38videoAItool-Windows
+          path: Hn38videoAItool-Windows.zip
+          if-no-files-found: error
