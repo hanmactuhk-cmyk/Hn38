@@ -1,0 +1,7 @@
+[
+ {"name":"Văn bản → Ảnh","type":"text_image","prompt":"","images":[],"enabled":true},
+ {"name":"Ảnh → Ảnh","type":"image_image","prompt":"","images":[],"enabled":true},
+ {"name":"Ảnh → Ảnh → Ảnh","type":"image_chain","prompt":"","images":[],"enabled":true},
+ {"name":"Văn bản → Video","type":"text_video","prompt":"","images":[],"enabled":true},
+ {"name":"Ảnh → Video","type":"image_video","prompt":"","images":[],"enabled":true}
+]
